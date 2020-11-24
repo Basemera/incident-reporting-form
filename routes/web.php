@@ -26,3 +26,12 @@ Route::get('/app', function () {
 Route::get('/form', function () {
     return view('form');
 });
+
+Route::get('incident-form', 'App\Http\Controllers\IncidentReportingController@getProducts');
+
+Route::post('incident', 'App\Http\Controllers\IncidentReportingController@reportIncident');
+
+
+// Route::get('/incident', function () {
+//     return view('form');
+// });
