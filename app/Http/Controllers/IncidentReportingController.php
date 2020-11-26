@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helpers;
 use App\Models\Incident;
 use App\Models\Product;
 use Carbon\Carbon;
@@ -33,6 +34,7 @@ class IncidentReportingController extends Controller
                         'assurance' => $input['assurance'],
                     ]
                     );
+                $product = Product::findOrFail($input['product_name']);
             } catch (Exception $e) {
                 $error = [
                     'status' => 'Error',
@@ -41,6 +43,17 @@ class IncidentReportingController extends Controller
                 ];
                 return response()->json($error, 400);
             }
+            $helpers =  new Helpers();
+            $data = [
+                'product_name' => $product->product_name,
+                'product_version' => $incident->product_version,
+                'date' => $incident->date_created,
+                'description' => $incident->description,
+                'lessons_learned' =>$incident->lessons_learned,
+                'assurance' => $incident->assurance
+
+            ];
+            $helpers->generatePDF($data);
             return response()->json($incident, 200);
         
         } else {
