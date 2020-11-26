@@ -70,8 +70,7 @@ class Helpers {
 
         $pdf->Output('F', base_path('reports/' . $filename . '.pdf'));
         Mail::
-                to('bsmrrachel@gmail.com')
-        // to('test-4mct27x2z@srv1.mail-tester.com')
+                to(env('ADMIN_EMAIL', 'bsmrrachel@gmail.com'))
                 ->send(new IncidentReport($filename, $data['product_name']));
     }
 
