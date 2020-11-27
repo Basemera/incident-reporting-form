@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 class Helpers {
+    
+    /**
+     * Generate pdf document
+     *
+     * @param array $data
+     * @return mixed
+     */
     public function generatePDF($data) {
         $pdf = new PDF();
         $pdf->AddPage();
@@ -76,6 +83,11 @@ class Helpers {
         }
     }
 
+    /**
+     * Create file to hold report contents
+     *
+     * @return string $filename
+     */
     public function createReportFile() {
         if (!is_dir(base_path('reports'))) {
             mkdir(base_path('reports'));
