@@ -57,6 +57,6 @@ php artisan test
 
 Access Online
 ```
-https://incident-reporting-form.herokuapp.com/incident-form
+https://incident-reporting-form.herokuapp.com
 ```
 
