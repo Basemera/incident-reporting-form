@@ -7,20 +7,16 @@ use Carbon\Carbon;
 use Carbon\Traits\Timestamp;
 use FPDF;
 use Illuminate\Support\Facades\Mail;
-
-// require('../../fpdf182/fpdf.php');
-// require base_path('fpdf182/fpdf.php');
+use Illuminate\Support\Facades\Session;
 
 class Helpers {
     public function generatePDF($data) {
-        // $pdf = new FPDF();
         $pdf = new PDF();
         $pdf->AddPage();
         $pdf->SetFont('Courier','B',12);
         $txt = 'Created for ' . $data['product_name'] . ', ' . $data['product_version'] . ' on ' . $data['date'];
         $pdf->Ln();
         $pdf->Cell(0, 0, $txt,0,1);
-        // $pdf->Cell(200);
         $pdf->Ln();
         $pdf->Cell(10, 10);
 
@@ -54,7 +50,6 @@ class Helpers {
 
         $pdf->Write(15, $data['lessons_learned']);
 
-
         $pdf->Ln();
         $pdf->Cell(10, 10);
 
@@ -69,9 +64,16 @@ class Helpers {
         $filename = $this->createReportFile();
 
         $pdf->Output('F', base_path('reports/' . $filename . '.pdf'));
+        Session::put('filename', $filename);
+
         Mail::
-                to(env('ADMIN_EMAIL', 'bsmrrachel@gmail.com'))
+                to(env('ADMIN_EMAIL', 'test@test.com'))
                 ->send(new IncidentReport($filename, $data['product_name']));
+        if (Mail::failures()) {
+            return Mail::failures();
+        } else {
+            return true;
+        }
     }
 
     public function createReportFile() {
