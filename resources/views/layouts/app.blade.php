@@ -48,6 +48,9 @@
 
 <body>
     @section('sidebar')
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="http://rapidup.bothofus.se/?redirect=%2Fleave%2Fform">Home</a>
+    </nav>
     @show
 
     <div class="container">

@@ -13,19 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
+Route::get('/', 'App\Http\Controllers\IncidentReportingController@getProducts');
 
-Route::get('/app', function () {
-    return view('layouts.app');
-});
-
-
-Route::get('/form', function () {
-    return view('form');
-});
 
 Route::get('incident-form', 'App\Http\Controllers\IncidentReportingController@getProducts');
 
