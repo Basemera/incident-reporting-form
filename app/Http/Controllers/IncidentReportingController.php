@@ -14,12 +14,23 @@ use Illuminate\Support\Facades\Validator;
 class IncidentReportingController extends Controller
 {
     //
+    /**
+     * Get all products
+     *
+     * @return Illuminate\Contracts\View\Factory
+     */
     public function getProducts() {
         $products = Product::all();
         Session::put('products', $products);
         return view('form')->with('products', $products);
     }
 
+    /**
+     * Report incident
+     *
+     * @param Request $request
+     * @return Illuminate\Contracts\View\Factory
+     */
     public function reportIncident(Request $request) {
         $input = $request->all();
         $validated = $this->validateInput($input);
@@ -90,6 +101,12 @@ class IncidentReportingController extends Controller
         }
     }
 
+    /**
+     * Validate input
+     *
+     * @param array $data
+     * @return Illuminate\Support\Facades\Validator
+     */
     protected function validateInput($data) {
         return Validator::make($data,[
             'product_name'=> ['string', 'required'],
