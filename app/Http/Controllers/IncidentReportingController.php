@@ -8,6 +8,7 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class IncidentReportingController extends Controller
@@ -15,7 +16,7 @@ class IncidentReportingController extends Controller
     //
     public function getProducts() {
         $products = Product::all();
-        // $versions = $products->versions;
+        Session::put('products', $products);
         return view('form')->with('products', $products);
     }
 
@@ -37,11 +38,10 @@ class IncidentReportingController extends Controller
                 $product = Product::findOrFail($input['product_name']);
             } catch (Exception $e) {
                 $error = [
-                    'status' => 'Error',
-                    'status_code' => 400,
                     'message' => $e->getMessage()
                 ];
-                return response()->json($error, 400);
+                $products = Session::get('products');
+                return view('form')->with('form_error', $error['message'])->with('products', $products);
             }
             $helpers =  new Helpers();
             $data = [
@@ -53,16 +53,40 @@ class IncidentReportingController extends Controller
                 'assurance' => $incident->assurance
 
             ];
-            $helpers->generatePDF($data);
-            return response()->json($incident, 200);
-        
+            
+            try {
+                $mail = $helpers->generatePDF($data);
+                $filename = Session::get('filename');
+                unlink(base_path('reports/' . $filename . '.pdf'));
+            } catch (Exception $e) {
+                $filename = Session::get('filename');
+                unlink(base_path('reports/' . $filename . '.pdf'));
+                $error = [
+                    'status' => 'Error',
+                    'status_code' => 400,
+                    'message' => $e->getMessage()
+                ];
+                $incident->status = false;
+                $incident->save();
+                return view('success')->with('mail_errors', array($error['message']));
+            }
+            if (is_array($mail)) {
+                $incident->status = false;
+                $incident->save();
+                return view('success')->with('mail_errors', $mail);
+            } else {
+                return view('success');
+            }        
         } else {
-            $error['status'] = 'Error';
-            $error['status_code'] = 400;
-            $error['message'] = 'The following fields are required.';
             $error['errors'] = $validated->messages();
-            $response = $error;
-            return response()->json($response, 400);
+            $products = Session::get('products');
+            $validation_errors = [];
+            $errors_obj = json_decode($error['errors']);
+            $errors_array = json_decode(json_encode($errors_obj), true);
+            foreach ($errors_array as $error) {
+                $validation_errors = array_merge($validation_errors, $error);
+            }
+            return view('form')->with('validation_errors', $validation_errors)->with('products', $products);
         }
     }
 
